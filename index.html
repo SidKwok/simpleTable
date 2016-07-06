@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>simpleTable</title>
+    </head>
+    <body>
+        <table id="simpleTable">
+            <thead>
+                <tr>
+                    <td>类型</td><td>版本号</td><td>文件名</td><td>上传时间</td><td>操作</td>
+                </tr>
+            </thead>
+        </table>
+        <table id="simple"></table>
+        <script src="./lib/jquery.js"></script>
+        <script src="simpleTable.js"></script>
+        <script type="text/javascript">
+            $('#simpleTable').simpleTable({
+                data: [
+                    [1, 2, 3, 4, 5],
+                    [6, 7, 8, 9, 10],
+                    [16, 17, 18, 19, 20]
+                ]
+            });
+        </script>
+    </body>
+</html>
