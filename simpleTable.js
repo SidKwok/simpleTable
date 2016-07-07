@@ -13,16 +13,8 @@
     };
     var currentPage = 1;
     var allPages = 0;
-
-    /**
-    * 初始化table
-    * @param {jQuery.el} el
-    */
-    function initTable (el) {
-
-    }
-
-
+    var searchData = [];
+    
     /**
     * 加载数据
     * @param {jQuery.el} el
@@ -101,7 +93,7 @@
     * @param {Array} data
     * TODO
     */
-    function loadSorter (el, data) {
+    function loadSorter (el, data, panigation) {
         // 取消事件绑定
         el.parent().find('thead').off('click');
 
@@ -111,8 +103,8 @@
             if (sortType === 'desc') {
                 data.sort(function(a, b) {
                     var gap = 0;
-                    if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
-                        gap = b[col - 1] - a[col - 1];
+                    if (typeof parseFloat(a[col - 1]) === 'number' && typeof parseFloat(b[col - 1]) === 'number') {
+                        gap = parseFloat(b[col - 1]) - parseFloat(a[col - 1]);
                     }
                     return gap;
                 });
@@ -120,14 +112,15 @@
             } else {
                 data.sort(function(a, b) {
                     var gap = 0;
-                    if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
-                        gap = a[col - 1] - b[col - 1];
+                    if (typeof parseFloat(a[col - 1]) === 'number' && typeof parseFloat(b[col - 1]) === 'number') {
+                        gap = parseFloat(a[col - 1]) - parseFloat(b[col - 1]);
                     }
                     return gap;
                 });
                 $(this).attr('data-sorttype', 'desc');
             }
-            loadTable(el, data, panigation, currentPage);
+            loadTable(el, data, panigation, 1);
+            loadPanigation(el, data, panigation, allPages);
         });
     }
 
@@ -165,30 +158,8 @@
                 $(this).attr('data-sorttype', 'desc');
             });
 
-            $this.parent().find('thead').on('click', '[data-sort]', function() {
-                var col = $(this).attr('data-sort');
-                var sortType = $(this).attr('data-sorttype');
-                if (sortType === 'desc') {
-                    data.sort(function(a, b) {
-                        var gap = 0;
-                        if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
-                            gap = b[col - 1] - a[col - 1];
-                        }
-                        return gap;
-                    });
-                    $(this).attr('data-sorttype', 'asc');
-                } else {
-                    data.sort(function(a, b) {
-                        var gap = 0;
-                        if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
-                            gap = a[col - 1] - b[col - 1];
-                        }
-                        return gap;
-                    });
-                    $(this).attr('data-sorttype', 'desc');
-                }
-                loadTable($this, data, panigation, currentPage);
-            });
+            loadSorter($this, data, panigation)
+            // });
         } else {
             console.log('木有指定排序');
         }
@@ -199,7 +170,7 @@
 
             $this.parent().find('input').on('keyup', function() {
                 var str = $(this).val();
-                var searchData = [];
+                searchData = [];
                 if (str) {
                     $.each(data, function (index, arr) {
                         $.each(arr, function (i, e) {
