@@ -15,6 +15,15 @@
     var allPages = 0;
 
     /**
+    * 初始化table
+    * @param {jQuery.el} el
+    */
+    function initTable (el) {
+
+    }
+
+
+    /**
     * 加载数据
     * @param {jQuery.el} el
     * @param {Array} data
@@ -41,28 +50,27 @@
         tbody.append(domArr.join(''));
     }
 
-    /**
-    * 分页器
-    *
-    */
-    function loadPanigation (el) {
-
-    }
-
     $.fn.simpleTable = function(opts) {
         var options = $.extend({}, $.fn.simpleTable.defaults, opts);
         var data = options.data;
         var panigation = options.panigation;
+        var sort = options.sort;
         var $this = $(this);
+
         if (data.length) {
             $this.wrap('<div class="simpleTable" />');
             $('<input type="text"></input>').insertBefore(this);
             $this.append('<tbody></tbody>');
             loadTable($this, data, panigation, currentPage);
+            $this.find('th').each(function(i, e) {
+                $(this).attr('data-sort', i + 1);
+                $(this).attr('data-sorttype', 'desc');
+            });
         } else {
             console.log('木有数据');
         }
 
+        // 分页
         if (panigation) {
             var domPan = [];
             allPages = Math.ceil(data.length / 10);
@@ -100,10 +108,38 @@
                 loadTable($this, data, panigation, currentPage);
                 console.log(currentPage);
             });
-
-
         } else {
             console.log('木有分页器');
+        }
+
+        // 排序
+        if (sort) {
+            $this.parent().find('thead').on('click', '[data-sort]', function() {
+                var col = $(this).attr('data-sort');
+                var sortType = $(this).attr('data-sorttype');
+                if (sortType === 'desc') {
+                    data.sort(function(a, b) {
+                        var gap = 0;
+                        if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
+                            gap = b[col - 1] - a[col - 1];
+                        }
+                        return gap;
+                    });
+                    $(this).attr('data-sorttype', 'asc');
+                } else {
+                    data.sort(function(a, b) {
+                        var gap = 0;
+                        if (typeof a[col - 1] === 'number' && typeof b[col - 1] === 'number') {
+                            gap = a[col - 1] - b[col - 1];
+                        }
+                        return gap;
+                    });
+                    $(this).attr('data-sorttype', 'desc');
+                }
+                loadTable($this, data, panigation, currentPage);
+            });
+        } else {
+            console.log('木有指定排序');
         }
     };
 
