@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>simpleTable</title>
-        <link rel="stylesheet" href="simpleTable.css">
+        <link rel="stylesheet" href="./src/simpleTable.css">
     </head>
     <body>
         <table id="simpleTable">
@@ -14,7 +14,7 @@
             </thead>
         </table>
         <script src="./lib/jquery.js"></script>
-        <script src="simpleTable.js"></script>
+        <script src="./src/simpleTable.js"></script>
         <script type="text/javascript">
             $('#simpleTable').simpleTable({
                 data: [
@@ -43,6 +43,8 @@
                     [17, 7, 'jjj', '5.2.0.0', 10],
                 ]
             });
+            $('#simpleTable').simpleTable('append', [1, 2, 3, 4, 5]);
+            $('#simpleTable').simpleTable('append', [5, 4, 3, 2, 1]);
         </script>
     </body>
 </html>

@@ -13,8 +13,9 @@
     };
     var currentPage = 1;
     var allPages = 0;
+    var originalData = [];
     var searchData = [];
-    
+
     /**
     * 加载数据
     * @param {jQuery.el} el
@@ -125,75 +126,91 @@
     }
 
     $.fn.simpleTable = function(opts) {
-        var options = $.extend({}, $.fn.simpleTable.defaults, opts);
-        var data = options.data;
-        var panigation = options.panigation;
-        var sort = options.sort;
-        var search = options.search;
         var $this = $(this);
 
-        if (data.length) {
-            $this.wrap('<div class="simpleTable" />');
-            $this.append('<tbody></tbody>');
-            loadTable($this, data, panigation, currentPage);
-        } else {
-            console.log('木有数据');
-        }
+        if (typeof opts === 'object') {
+            var options = $.extend({}, $.fn.simpleTable.defaults, opts);
+            originalData = options.data;
+            var panigation = options.panigation;
+            var sort = options.sort;
+            var search = options.search;
 
-        // 分页
-        if (panigation) {
-            allPages = Math.ceil(data.length / 10);
+            if (originalData.length) {
+                $this.wrap('<div class="simpleTable" />');
+                $this.append('<tbody></tbody>');
+                loadTable($this, originalData, panigation, currentPage);
+            } else {
+                console.log('木有数据');
+            }
 
-            // init Panigation
-            $('<div class="panigation"></div>').insertAfter(this);
-            loadPanigation($this, data, panigation, allPages);
-        } else {
-            console.log('木有分页器');
-        }
+            // 分页
+            if (panigation) {
+                allPages = Math.ceil(originalData.length / 10);
 
-        // 排序
-        if (sort) {
-            $this.find('th').each(function(i, e) {
-                $(this).attr('data-sort', i + 1);
-                $(this).attr('data-sorttype', 'desc');
-            });
+                // init Panigation
+                $('<div class="panigation"></div>').insertAfter(this);
+                loadPanigation($this, originalData, panigation, allPages);
+            } else {
+                console.log('木有分页器');
+            }
 
-            loadSorter($this, data, panigation)
-            // });
-        } else {
-            console.log('木有指定排序');
-        }
+            // 排序
+            if (sort) {
+                $this.find('th').each(function(i, e) {
+                    $(this).attr('data-sort', i + 1);
+                    $(this).attr('data-sorttype', 'desc');
+                });
 
-        // 搜索
-        if (search) {
-            $('<input type="text"></input>').insertBefore(this);
+                loadSorter($this, originalData, panigation);
+            } else {
+                console.log('木有指定排序');
+            }
 
-            $this.parent().find('input').on('keyup', function() {
-                var str = $(this).val();
-                searchData = [];
-                if (str) {
-                    $.each(data, function (index, arr) {
-                        $.each(arr, function (i, e) {
-                            if (('' + e).toLowerCase().indexOf(str) !== -1) {
-                                searchData.push(arr);
-                                return false;
-                            }
+            // 搜索
+            if (search) {
+                $('<input type="text"></input>').insertBefore(this);
+
+                $this.parent().find('input').on('keyup', function() {
+                    var str = $(this).val();
+                    searchData = [];
+                    if (str) {
+                        $.each(originalData, function (index, arr) {
+                            $.each(arr, function (i, e) {
+                                if (('' + e).toLowerCase().indexOf(str) !== -1) {
+                                    searchData.push(arr);
+                                    return false;
+                                }
+                            });
                         });
-                    });
-                    currentPage = 1;
-                    loadTable($this, searchData, panigation, currentPage);
+                        currentPage = 1;
+                        loadTable($this, searchData, panigation, currentPage);
 
-                    var ap = Math.ceil(searchData.length / 10);
-                    loadPanigation($this, searchData, panigation, ap);
-                } else {
-                    loadTable($this, data, panigation, currentPage);
-                    loadPanigation($this, data, panigation, allPages);
-                }
-            });
+                        var ap = Math.ceil(searchData.length / 10);
+                        loadPanigation($this, searchData, panigation, ap);
+                    } else {
+                        loadTable($this, originalData, panigation, currentPage);
+                        loadPanigation($this, originalData, panigation, allPages);
+                    }
+                });
+            } else {
+                console.log('木有搜索');
+            }
         } else {
-            console.log('木有搜索');
+            if (opts === 'append') {
+                var row = arguments[1];
+                originalData.push(row);
+                loadTable($this, originalData, panigation, currentPage);
+            }
+
+            if (opts === 'remove') {
+
+            }
         }
     };
 
     $.fn.simpleTable.defaults = defaults;
+
+    $.fn.simpleTable.prototype.del = function () {
+        console.log('test');
+    }
 })(jQuery)
