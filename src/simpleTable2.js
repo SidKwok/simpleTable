@@ -7,19 +7,6 @@
 
 (function ($) {
 
-    var appendRow = function (tbody, data) {
-        tbody.children().detach();
-        var domArr = [];
-        $.each(data, function (index, arr) {
-            domArr.push('<tr data-rowid="' + arr[0] + '">')
-            for (var i = 1; i < arr.length; i++) {
-                domArr.push('<td>' + arr[i] + '</td>');
-            }
-            domArr.push('</tr>');
-        });
-        tbody.append(domArr.join(''));
-    }
-
     // SIMPLETABLE CLASS DEFINITION
     // ======================
 
@@ -95,7 +82,18 @@
     }
 
     SimpleTable.prototype.updateTable = function () {
-        appendRow(this.$el.find('tbody'), this.pageData);
+        var tbody = this.$el.find('tbody');
+        var data = this.pageData;
+        tbody.children().detach();
+        var domArr = [];
+        $.each(data, function (index, arr) {
+            domArr.push('<tr data-rowid="' + arr[0] + '">')
+            for (var i = 1; i < arr.length; i++) {
+                domArr.push('<td>' + arr[i] + '</td>');
+            }
+            domArr.push('</tr>');
+        });
+        tbody.append(domArr.join(''));
     }
 
     SimpleTable.prototype.initSearch = function () {
@@ -230,7 +228,8 @@
                 });
                 $(this).attr('data-sorttype', 'desc');
             }
-            that.updateTable('sort');
+            that.updatePagination();
+            that.updateTable();
         });
     }
 
