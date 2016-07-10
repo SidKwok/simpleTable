@@ -71,15 +71,20 @@
     SimpleTable.prototype.updateTable = function () {
         var tbody = this.$el.find('tbody');
         var data = this.pageData;
-        tbody.children().detach();
         var domArr = [];
-        $.each(data, function (index, arr) {
-            domArr.push('<tr data-rowid="' + arr[0] + '">')
-            for (var i = 1; i < arr.length; i++) {
-                domArr.push('<td>' + arr[i] + '</td>');
-            }
-            domArr.push('</tr>');
-        });
+
+        tbody.children().detach();
+
+        if (data.length) {
+            $.each(data, function (index, arr) {
+                domArr.push('<tr data-rowid="' + arr[0] + '">')
+                for (var i = 1; i < arr.length; i++) {
+                    domArr.push('<td>' + arr[i] + '</td>');
+                }
+                domArr.push('</tr>');
+            });
+        }
+
         tbody.append(domArr.join(''));
     }
 
@@ -98,6 +103,7 @@
                     }
                 }
             });
+
             that.updatePagination();
             that.updatePageNumber();
             that.updateTable();
@@ -126,8 +132,10 @@
 
         that.pageData = [];
 
-        for (var i = first; i < end; i++) {
-            that.pageData.push(data[i]);
+        if (data.length) {
+            for (var i = first; i < end; i++) {
+                that.pageData.push(data[i]);
+            }
         }
     }
 
@@ -198,7 +206,7 @@
             var col = $(this).attr('data-sort');
             var sortType = $(this).attr('data-sorttype');
             if (sortType === 'desc') {
-                data.sort(function(a, b) {
+                that.bufferData.sort(function(a, b) {
                     var gap = 0;
                     if (typeof parseFloat(a[col]) === 'number' && typeof parseFloat(b[col]) === 'number') {
                         gap = parseFloat(b[col]) - parseFloat(a[col]);
@@ -207,7 +215,7 @@
                 });
                 $(this).attr('data-sorttype', 'asc');
             } else {
-                data.sort(function(a, b) {
+                that.bufferData.sort(function(a, b) {
                     var gap = 0;
                     if (typeof parseFloat(a[col]) === 'number' && typeof parseFloat(b[col]) === 'number') {
                         gap = parseFloat(a[col]) - parseFloat(b[col]);
