@@ -29,20 +29,7 @@
     };
 
     SimpleTable.prototype.init = function () {
-        this.initData();
         this.initTable();
-        // this.initSearch();
-        // this.initPagination();
-        // this.initSort();
-    }
-
-    SimpleTable.prototype.initData = function (data, type) {
-        // if (type === 'append') {
-        //     this.options.data = this.options.data.concat(data);
-        // } else {
-        //     this.options.data = this.data;
-        // }
-        // console.log('initData');
     }
 
     SimpleTable.prototype.initTable = function () {
@@ -233,17 +220,30 @@
         });
     }
 
+    SimpleTable.prototype.append = function (row) {
+        row.unshift(this.options.data.length);
+        this.options.data.unshift(row);
+        this.updatePagination();
+        this.updatePageNumber();
+        this.updateTable();
+    }
+
+    SimpleTable.prototype.remove = function (row) {
+        // TODO
+        console.log('remove');
+    }
+
     var allowedMethods = ['append', 'remove'];
 
     $.fn.simpleTable = function(opt) {
-        var options = $.extend({}, SimpleTable.DEFAULTS, options);
+        var options = $.extend({}, SimpleTable.DEFAULTS, options),
+            arg = arguments[1];
         this.each(function () {
             var $this = $(this),
                 data = $this.data('simpleTable'),
                 options = $.extend({}, SimpleTable.DEFAULTS, $this.data(),
                     typeof opt === 'object' && opt);
-            if (opt === 'string') {
-                var row = arguments[1];
+            if (typeof opt === 'string') {
                 if ($.inArray(opt, allowedMethods) < 0) {
                     throw new Error('Unknow method: ' + opt);
                 }
@@ -251,13 +251,17 @@
                 if (!data) {
                     return;
                 }
-            }
 
+                if (opt === 'append') {
+                    data.append(arg);
+                }
+                if (opt === 'remove') {
+                    data.remove(arg);
+                }
+            }
             if (!data) {
                 $this.data('simpleTable', (data = new SimpleTable(this, options)));
             }
-
-            console.log(data);
         });
     };
 
