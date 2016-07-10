@@ -120,93 +120,81 @@
 
     SimpleTable.prototype.initPagination = function () {
         $('<div class="pagination"></div>').insertAfter(this.$el);
+        this.$el.parent().find('.pagination').append(
+            '<span>' +
+                '<a href="javascript: void(0);" data-stfront="0">&lt;</a>' +
+                    '<span class="pageNumber"></span>' +
+                '<a href="javascript: void(0);" data-stback="2">&gt;</a>' +
+            '</span>');
         this.updatePagination();
+        this.updatePageNumber();
+        this.onPagination();
     }
 
     SimpleTable.prototype.updatePagination = function () {
         var data = this.bufferData;
-        var pagination = this.$el.parent().find('.pagination');
         var length = Math.ceil(data.length / 10);
         var first = (this.currentPage - 1) * 10;
-        var end = (this.currentPage === length) ? (data.length - first) : (first + 10);
-        var domArr = [];
+        var end = (this.currentPage === length) ? data.length : (first + 10);
         var that = this;
 
         that.pageData = [];
-        pagination.children().detach();
-        pagination.off('click');
-
-        domArr.push('<span><a href="javascript: void(0);" data-stfront="1">&lt;</a>');
-        for (var i = 0; i < length; i++) {
-            domArr.push('<a href="javascript: void(0);" data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
-        }
-        domArr.push('<a href="javascript: void(0);" data-stback="3">&gt;</a></span>');
-        pagination.append(domArr.join(''));
 
         for (var i = first; i < end; i++) {
             that.pageData.push(data[i]);
         }
+    }
 
-        // // 上一页
-        // pagination.find('[data-stfront]').on('click', function() {
-        //     var first = 0;
-        //     var end = 0;
-        //     that.pageData = [];
-        //     var currentPage = $(this).attr('data-stfront');
-        //
-        //     if (currentPage > 0) {
-        //         $(this).attr('data-stfront', currentPage - 1);
-        //         first = (currentPage - 1) * 10;
-        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
-        //
-        //         for (var i = first; i < end; i++) {
-        //             that.pageData.push(data[i]);
-        //         }
-        //         appendRow(that.$el.find('tbody'), that.pageData);
-        //     }
-        // });
+    SimpleTable.prototype.updatePageNumber = function () {
+        var length = Math.ceil(this.bufferData.length / 10);
+        var pagination = this.$el.parent().find('.pagination .pageNumber');
+        var domArr = [];
 
-        // // 下一页
-        // pagination.find('[data-stback]').on('click', function() {
-        //     var first = 0;
-        //     var end = 0;
-        //     that.pageData = [];
-        //     var currentPage = $(this).attr('data-stback');
-        //
-        //     if (currentPage <= data.length) {
-        //         $(this).attr('data-stback', currentPage + 1);
-        //         first = (currentPage - 1) * 10;
-        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
-        //
-        //         for (var i = first; i < end; i++) {
-        //             that.pageData.push(data[i]);
-        //         }
-        //         appendRow(that.$el.find('tbody'), that.pageData);
-        //     }
-        // });
+        pagination.children().detach();
 
-        // 特定页数
-        // pagination.on('click', '[data-stpage]', function() {
-        //     var first = 0;
-        //     var end = 0;
-        //     that.pageData = [];
-        //     var currentPage = $(this).attr('data-stback');
-        //
-        //     if (currentPage <= data.length) {
-        //         $(this).attr('data-stback', currentPage + 1);
-        //         first = (currentPage - 1) * 10;
-        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
-        //
-        //         for (var i = first; i < end; i++) {
-        //             that.pageData.push(data[i]);
-        //         }
-        //         appendRow(that.$el.find('tbody'), that.pageData);
-        //     }
-        // });
+        for (var i = 0; i < length; i++) {
+            domArr.push('<a href="javascript: void(0);" data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
+        }
+
+        pagination.append(domArr.join(''));
     }
 
     SimpleTable.prototype.onPagination = function () {
-        // TODO
+        var pagination = this.$el.parent().find('.pagination');
+        var that = this;
+
+        // 上一页
+        pagination.find('[data-stfront]').on('click', function () {
+            if (that.currentPage > 1) {
+                that.currentPage -= 1;
+                $(this).attr('data-stfront', that.currentPage - 1);
+                pagination.find('[data-stback]').attr('data-stback', that.currentPage + 1);
+                that.updatePagination();
+                that.updateTable();
+            }
+        });
+
+        // 下一页
+        pagination.find('[data-stback]').on('click', function () {
+            var nextPage = parseInt($(this).attr('data-stback'));
+            var allPages = Math.ceil(that.bufferData.length / 10);
+            if (nextPage <= allPages) {
+                that.currentPage += 1;
+                pagination.find('[data-stfront]').attr('data-stfront', that.currentPage - 1);
+                $(this).attr('data-stback', that.currentPage + 1);
+                that.updatePagination();
+                that.updateTable();
+            }
+        });
+
+        // 特定页
+        pagination.on('click', '[data-stpage]', function () {
+            that.currentPage = parseInt($(this).attr('data-stpage'));
+            pagination.find('[data-stfront]').attr('data-stfront', that.currentPage - 1);
+            pagination.find('[data-stback]').attr('data-stfront', that.currentPage + 1);
+            that.updatePagination();
+            that.updateTable();
+        })
     }
 
     SimpleTable.prototype.initSort = function () {
