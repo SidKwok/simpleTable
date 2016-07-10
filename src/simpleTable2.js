@@ -99,6 +99,7 @@
                 }
             });
             that.updatePagination();
+            that.updatePageNumber();
             that.updateTable();
         });
     }
