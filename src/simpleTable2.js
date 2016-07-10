@@ -27,6 +27,8 @@
         this.options = options;
         this.$el = $(el);
         this.$el_ = this.$el.clone();
+        this.bufferData = [];
+        this.pageData = [];
         this.currentPage = 1;
 
         this.init();
@@ -65,6 +67,7 @@
             data.push(e);
         })
         this.options.data = data;
+        this.bufferData = data;
 
         // 包一层
         this.$el.wrap('<div class="simpleTable" />');
@@ -87,56 +90,49 @@
         if (this.options.sort) {
             this.initSort();
         }
+
+        this.updateTable();
     }
 
-    SimpleTable.prototype.updateTable = function (type, otherData) {
-        var data = this.options.data;
-        var tbody = this.$el.find('tbody');
-        switch (type) {
-            case 'init':
-            case 'sort':
-                appendRow(tbody, data);
-                // this.updatePagination(data);
-                break;
-            case 'search':
-                appendRow(tbody, otherData);
-                break;
-            default:
-
-        }
-
+    SimpleTable.prototype.updateTable = function () {
+        appendRow(this.$el.find('tbody'), this.pageData);
     }
 
     SimpleTable.prototype.initSearch = function () {
-        // TODO
         var that = this;
+        var tbody = that.$el.find('tbody');
         $('<input type="text"></input>').insertBefore(this.$el);
         that.$el.parent().find('input').on('keyup', function () {
             var str = $(this).val();
-            var searchData = [];
+            that.bufferData = [];
             $.each(that.options.data, function (index, arr) {
                 for (var i = 1; i < arr.length; i++) {
                     if (('' + arr[i]).toLowerCase().indexOf(str) >= 0) {
-                        searchData.push(arr);
+                        that.bufferData.push(arr);
                         break;
                     }
                 }
             });
-            that.updateTable('search', searchData);
+            that.updatePagination();
+            that.updateTable();
         });
     }
 
     SimpleTable.prototype.initPagination = function () {
         $('<div class="pagination"></div>').insertAfter(this.$el);
-        this.updatePagination(this.options.data);
+        this.updatePagination();
     }
 
-    SimpleTable.prototype.updatePagination = function (data) {
+    SimpleTable.prototype.updatePagination = function () {
+        var data = this.bufferData;
         var pagination = this.$el.parent().find('.pagination');
         var length = Math.ceil(data.length / 10);
+        var first = (this.currentPage - 1) * 10;
+        var end = (this.currentPage === length) ? (data.length - first) : (first + 10);
         var domArr = [];
         var that = this;
 
+        that.pageData = [];
         pagination.children().detach();
         pagination.off('click');
 
@@ -147,56 +143,70 @@
         domArr.push('<a href="javascript: void(0);" data-stback="3">&gt;</a></span>');
         pagination.append(domArr.join(''));
 
-        // 上一页
-        pagination.find('[data-stfront]').on('click', function() {
-            var first = 0;
-            var end = 0;
-            var pageData = [];
-            var currentPage = $(this).attr('data-stfront');
+        for (var i = first; i < end; i++) {
+            that.pageData.push(data[i]);
+        }
 
-            if (currentPage > 0) {
-                $(this).attr('data-stfront', currentPage - 1);
-                first = (currentPage - 1) * 10;
-                end = ((data.length - first) > 10) ? (first + 10) : data.length;
+        // // 上一页
+        // pagination.find('[data-stfront]').on('click', function() {
+        //     var first = 0;
+        //     var end = 0;
+        //     that.pageData = [];
+        //     var currentPage = $(this).attr('data-stfront');
+        //
+        //     if (currentPage > 0) {
+        //         $(this).attr('data-stfront', currentPage - 1);
+        //         first = (currentPage - 1) * 10;
+        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
+        //
+        //         for (var i = first; i < end; i++) {
+        //             that.pageData.push(data[i]);
+        //         }
+        //         appendRow(that.$el.find('tbody'), that.pageData);
+        //     }
+        // });
 
-                for (var i = first; i < end; i++) {
-                    pageData.push(data[i]);
-                }
-                appendRow(that.$el.find('tbody'), pageData);
-            }
-        });
-
-        // 下一页
+        // // 下一页
         // pagination.find('[data-stback]').on('click', function() {
-        //     if (currentPage + 1 <= ap) {
-        //         currentPage += 1;
-        //         loadTable(el, data, panigation, currentPage);
+        //     var first = 0;
+        //     var end = 0;
+        //     that.pageData = [];
+        //     var currentPage = $(this).attr('data-stback');
+        //
+        //     if (currentPage <= data.length) {
+        //         $(this).attr('data-stback', currentPage + 1);
+        //         first = (currentPage - 1) * 10;
+        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
+        //
+        //         for (var i = first; i < end; i++) {
+        //             that.pageData.push(data[i]);
+        //         }
+        //         appendRow(that.$el.find('tbody'), that.pageData);
         //     }
         // });
 
         // 特定页数
-        pagination.on('click', '[data-stpage]', function() {
-            var first = 0;
-            var end = 0;
-            var pageData = [];
-            var currentPage = $(this).attr('data-stback');
+        // pagination.on('click', '[data-stpage]', function() {
+        //     var first = 0;
+        //     var end = 0;
+        //     that.pageData = [];
+        //     var currentPage = $(this).attr('data-stback');
+        //
+        //     if (currentPage <= data.length) {
+        //         $(this).attr('data-stback', currentPage + 1);
+        //         first = (currentPage - 1) * 10;
+        //         end = ((data.length - first) > 10) ? (first + 10) : data.length;
+        //
+        //         for (var i = first; i < end; i++) {
+        //             that.pageData.push(data[i]);
+        //         }
+        //         appendRow(that.$el.find('tbody'), that.pageData);
+        //     }
+        // });
+    }
 
-            if (currentPage <= data.length) {
-                $(this).attr('data-stback', currentPage + 1);
-                first = (currentPage - 1) * 10;
-                end = ((data.length - first) > 10) ? (first + 10) : data.length;
-
-                for (var i = first; i < end; i++) {
-                    pageData.push(data[i]);
-                }
-                appendRow(that.$el.find('tbody'), pageData);
-            }
-
-            currentPage = $(this).attr('data-stpage');
-            loadTable(el, data, panigation, currentPage);
-        });
-
-
+    SimpleTable.prototype.onPagination = function () {
+        // TODO
     }
 
     SimpleTable.prototype.initSort = function () {
