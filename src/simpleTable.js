@@ -7,6 +7,31 @@
 
 (function ($) {
 
+    var calculateObjectValue = function (o) {
+        var arr = [];
+        var strCount = 0;
+        if (typeof o === 'number') {
+            o += '';
+        }
+
+        if (typeof o === 'string') {
+            arr = o.split('').filter(function (item, index) {
+                return $.isNumeric(item);
+            });
+
+            if (!arr.length) {
+                for (var i = 0; i< o.length; i++) {
+                    strCount += o.charCodeAt(i);
+                }
+                return strCount;
+            } else {
+               return parseInt(arr.join(''));
+            }
+        } else {
+            return 0;
+        }
+    };
+
     // SIMPLETABLE CLASS DEFINITION
     // ======================
 
@@ -231,21 +256,13 @@
             var col = $(this).attr('data-sort');
             var sortType = $(this).attr('data-sorttype');
             if (sortType === 'desc') {
-                that.bufferData.sort(function(a, b) {
-                    var gap = 0;
-                    if (typeof parseFloat(a[col]) === 'number' && typeof parseFloat(b[col]) === 'number') {
-                        gap = parseFloat(b[col]) - parseFloat(a[col]);
-                    }
-                    return gap;
+                that.bufferData.sort(function (a, b) {
+                    return calculateObjectValue(a[col]) - calculateObjectValue(b[col]);
                 });
                 $(this).attr('data-sorttype', 'asc');
             } else {
                 that.bufferData.sort(function(a, b) {
-                    var gap = 0;
-                    if (typeof parseFloat(a[col]) === 'number' && typeof parseFloat(b[col]) === 'number') {
-                        gap = parseFloat(a[col]) - parseFloat(b[col]);
-                    }
-                    return gap;
+                    return calculateObjectValue(b[col]) - calculateObjectValue(a[col]);
                 });
                 $(this).attr('data-sorttype', 'desc');
             }

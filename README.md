@@ -3,7 +3,7 @@
 
 ## Why I did this?
 
-之前一直用dataTable进行表格的处理，dataTable是一个很好的表格解决方案。但是感觉我在日常开发中，dataTable中有很多功能我都是没有使用到的，以致于引入了许多不必要的代码。所以我根据自己的业务需求整了一个，功能非常的简单，甚至有点太简单了，连样式都没有，但是这提供了一个很好的自定义方案。
+之前一直用dataTable进行表格的处理，dataTable是一个很好的表格解决方案。但是感觉我在日常开发中，dataTable中有很多功能我都是没有使用到的，以致于引入了许多不必要的代码。所以我根据自己的业务需求整了一个，功能非常的简单，甚至有点太简单了(如果嫌麻烦可以直接用我提供的样式)，连样式都没有，但是这提供了一个很好的自定义方案。
 
 ## Features
 
@@ -78,7 +78,7 @@ $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
 $('#simpleTable').simpleTable('remove',$($('#simpleTable').find('[data-rowid]')[2]));
 ```
 
-更新数据。请将相应行的dom元素和更新的数据穿进去:
+更新数据。请将相应行的dom元素和更新的数据传进去:
 
 ```js
 $('#simpleTable').simpleTable('update',
