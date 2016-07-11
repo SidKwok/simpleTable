@@ -2,15 +2,10 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify')
     rename = require('gulp-rename');
 
-gulp.task('uglifyjs', function(){
+gulp.task('build', function(){
     return gulp.src('./src/simpleTable.js')
+        .pipe(gulp.dest('./dist'))
         .pipe(uglify())
-        .pipe(rename(function (path) {
-            path.basename += '.min';
-        }))
+        .pipe(rename({ extname: '.min.js'}))
         .pipe(gulp.dest('./dist'));
-});
-
-gukp.task('rename', function(){
-    return gulp.src('./dist/')
 });
