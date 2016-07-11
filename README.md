@@ -64,8 +64,15 @@ $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
 删除数据。请将相应行的dom元素传进去:
 
 ```js
-$('#simpleTable').simpleTable('remove',$($('#simpleTable').find('[data-rowid]')[2]);
+$('#simpleTable').simpleTable('remove',$($('#simpleTable').find('[data-rowid]')[2]));
+```
 
+更新数据。请将相应行的dom元素和更新的数据穿进去:
+
+```js
+$('#simpleTable').simpleTable('update',
+                $($('#simpleTable').find('[data-rowid]')[2]),
+                ["21sid", "aaasid", "sssid", '6.4.0.3sid', 10]);
 ```
 
 搜索(默认开启，暂不支持关闭的情况)

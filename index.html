@@ -45,6 +45,9 @@
             });
             $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
             $('#simpleTable').simpleTable('remove', $($('#simpleTable').find('[data-rowid]')[2]));
+            $('#simpleTable').simpleTable('update',
+                            $($('#simpleTable').find('[data-rowid]')[2]),
+                            ["21sid", "aaasid", "sssid", '6.4.0.3sid', 10]);
         </script>
     </body>
 </html>

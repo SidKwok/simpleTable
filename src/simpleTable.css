@@ -1,7 +1,6 @@
 /***********************************************/
 /*****************   SIMPLETABLE BASE    ******************/
 /***********************************************/
-
 .simpleTable table {
     text-align: left;
     width: 100%;
@@ -20,4 +19,42 @@
     background: #fff;
     border: 1px solid #e5e5e5;
     padding-left: 10px;
+}
+
+.simpleTable .stSearch {
+    width: 150px;
+    height: 20px;
+    margin: 10px;
+}
+
+.simpleTable .pagination {
+    margin: 10px;
+    text-align: right;
+}
+.simpleTable .pagination a {
+    text-decoration: none;
+    color: #666;
+}
+.simpleTable .pagination .stfront,
+.simpleTable .pagination .pageNumber a {
+    border: 1px solid #e5e5e5;
+    border-right: none;
+}
+.simpleTable .pagination .stback {
+    border: 1px solid #e5e5e5;
+}
+.simpleTable .pagination a {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    padding-top: 12px;
+}
+.simpleTable .pagination .stfront:hover,
+.simpleTable .pagination .pageNumber a:hover,
+.simpleTable .pagination .stback:hover,
+.simpleTable .pagination .active {
+    background-color: #007aff;
+    color: #fff;
 }

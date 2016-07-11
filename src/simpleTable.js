@@ -91,7 +91,7 @@
     SimpleTable.prototype.initSearch = function () {
         var that = this;
         var tbody = that.$el.find('tbody');
-        $('<input type="text"></input>').insertBefore(this.$el);
+        $('<input type="text" class="stSearch" placeholder="搜索"></input>').insertBefore(this.$el);
         that.$el.parent().find('input').on('keyup', function () {
             var str = $(this).val();
             that.bufferData = [];
@@ -114,9 +114,9 @@
         $('<div class="pagination"></div>').insertAfter(this.$el);
         this.$el.parent().find('.pagination').append(
             '<span>' +
-                '<a href="javascript: void(0);" data-stfront="0">&lt;</a>' +
+                '<a href="javascript: void(0);" class="stfront" data-stfront="0">&lt;</a>' +
                     '<span class="pageNumber"></span>' +
-                '<a href="javascript: void(0);" data-stback="2">&gt;</a>' +
+                '<a href="javascript: void(0);" class="stback" data-stback="2">&gt;</a>' +
             '</span>');
         this.updatePagination();
         this.updatePageNumber();
@@ -143,11 +143,16 @@
         var length = Math.ceil(this.bufferData.length / 10);
         var pagination = this.$el.parent().find('.pagination .pageNumber');
         var domArr = [];
+        var cp = this.currentPage;
 
         pagination.children().detach();
 
         for (var i = 0; i < length; i++) {
-            domArr.push('<a href="javascript: void(0);" data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
+            domArr.push('<a href="javascript: void(0);" ' +
+                            'class="' + (cp === (i + 1) ? 'active' : '') +'" ' +
+                            'data-stpage="' + (i + 1) + '">' +
+                            (i + 1) +
+                        '</a>');
         }
 
         pagination.append(domArr.join(''));
@@ -160,7 +165,9 @@
         // 上一页
         pagination.find('[data-stfront]').on('click', function () {
             if (that.currentPage > 1) {
+                pagination.find('[data-stpage="' + that.currentPage + '"]').removeClass('active');
                 that.currentPage -= 1;
+                pagination.find('[data-stpage="' + that.currentPage + '"]').addClass('active');
                 $(this).attr('data-stfront', that.currentPage - 1);
                 pagination.find('[data-stback]').attr('data-stback', that.currentPage + 1);
                 that.updatePagination();
@@ -172,8 +179,11 @@
         pagination.find('[data-stback]').on('click', function () {
             var nextPage = parseInt($(this).attr('data-stback'));
             var allPages = Math.ceil(that.bufferData.length / 10);
+
             if (nextPage <= allPages) {
+                pagination.find('[data-stpage="' + that.currentPage + '"]').removeClass('active');
                 that.currentPage += 1;
+                pagination.find('[data-stpage="' + that.currentPage + '"]').addClass('active');
                 pagination.find('[data-stfront]').attr('data-stfront', that.currentPage - 1);
                 $(this).attr('data-stback', that.currentPage + 1);
                 that.updatePagination();
@@ -183,7 +193,9 @@
 
         // 特定页
         pagination.on('click', '[data-stpage]', function () {
+            pagination.find('[data-stpage="' + that.currentPage + '"]').removeClass('active');
             that.currentPage = parseInt($(this).attr('data-stpage'));
+            pagination.find('[data-stpage="' + that.currentPage + '"]').addClass('active');
             pagination.find('[data-stfront]').attr('data-stfront', that.currentPage - 1);
             pagination.find('[data-stback]').attr('data-stfront', that.currentPage + 1);
             that.updatePagination();
@@ -253,11 +265,27 @@
         this.updateTable();
     }
 
-    var allowedMethods = ['append', 'remove'];
+    SimpleTable.prototype.update = function (args) {
+        var rowid = parseInt(args[0].attr('data-rowid'))
+        var that = this;
+
+        $.each(this.options.data, function (i, e) {
+            if (e[0] === rowid) {
+                that.options.data[i] = args[1];
+                that.options.data[i].unshift(rowid);
+                return false;
+            }
+        });
+
+        this.updatePagination();
+        this.updateTable();
+    }
+
+    var allowedMethods = ['append', 'remove', 'update'];
 
     $.fn.simpleTable = function(opt) {
         var options = $.extend({}, SimpleTable.DEFAULTS, options),
-            arg = arguments[1];
+            args = Array.prototype.slice.call(arguments, 1);
         this.each(function () {
             var $this = $(this),
                 data = $this.data('simpleTable'),
@@ -273,10 +301,13 @@
                 }
 
                 if (opt === 'append') {
-                    data.append(arg);
+                    data.append(args[0]);
                 }
                 if (opt === 'remove') {
-                    data.remove(arg);
+                    data.remove(args[0]);
+                }
+                if (opt === 'update') {
+                    data.update(args);
                 }
             }
             if (!data) {
