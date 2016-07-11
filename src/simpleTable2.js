@@ -238,8 +238,19 @@
     }
 
     SimpleTable.prototype.remove = function (row) {
-        // TODO
-        console.log('remove');
+        var rowid = parseInt(row.attr('data-rowid'));
+        var that = this;
+
+        $.each(this.options.data, function(i, e) {
+            if (e[0] === rowid) {
+                that.options.data.splice(i, 1);
+                return false;
+            }
+        });
+
+        this.updatePagination();
+        this.updatePageNumber();
+        this.updateTable();
     }
 
     var allowedMethods = ['append', 'remove'];

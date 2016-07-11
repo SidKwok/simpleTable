@@ -43,10 +43,8 @@
                     [17, 7, 'jjj', '5.2.0.0', 10],
                 ]
             });
-            for (var i = 0; i < 28; i ++) {
-                $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
-            }
             $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
+            $('#simpleTable').simpleTable('remove', $($('#simpleTable').find('[data-rowid]')[2]));
         </script>
     </body>
 </html>
