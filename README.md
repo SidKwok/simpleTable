@@ -55,6 +55,17 @@ done!
 
 ## API
 
+默认值:
+
+```js
+$('#simpleTable').simpleTable({
+    data: [],
+    sort: true,
+    search: true,
+    pagination: true
+});
+```
+
 添加数据。请保证数据的项数与表头一致:
 
 ```js
@@ -74,15 +85,3 @@ $('#simpleTable').simpleTable('update',
                 $($('#simpleTable').find('[data-rowid]')[2]),
                 ["21sid", "aaasid", "sssid", '6.4.0.3sid', 10]);
 ```
-
-搜索(默认开启，暂不支持关闭的情况)
-
-
-
-
-排序(默认开启，暂不支持关闭的情况)
-
-
-
-
-分页(默认开启，暂不支持关闭的情况)

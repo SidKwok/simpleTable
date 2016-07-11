@@ -53,6 +53,8 @@
         // 分页
         if (this.options.pagination) {
             this.initPagination();
+        } else {
+            this.pageData = data;
         }
 
         // 搜索
@@ -124,6 +126,12 @@
     }
 
     SimpleTable.prototype.updatePagination = function () {
+
+        if (!this.options.pagination) {
+            this.pageData = this.bufferData;
+            return;
+        }
+
         var data = this.bufferData;
         var length = Math.ceil(data.length / 10);
         var first = (this.currentPage - 1) * 10;
@@ -140,6 +148,11 @@
     }
 
     SimpleTable.prototype.updatePageNumber = function () {
+
+        if (!this.options.pagination) {
+            return;
+        }
+
         var length = Math.ceil(this.bufferData.length / 10);
         var pagination = this.$el.parent().find('.pagination .pageNumber');
         var domArr = [];
@@ -236,6 +249,7 @@
                 });
                 $(this).attr('data-sorttype', 'desc');
             }
+
             that.updatePagination();
             that.updateTable();
         });
@@ -244,6 +258,7 @@
     SimpleTable.prototype.append = function (row) {
         row.unshift(this.options.data.length);
         this.options.data.unshift(row);
+
         this.updatePagination();
         this.updatePageNumber();
         this.updateTable();

@@ -17,6 +17,9 @@
         <script src="./src/simpleTable.js"></script>
         <script type="text/javascript">
             $('#simpleTable').simpleTable({
+                pagination: false,
+                sort: false,
+                search: false,
                 data: [
                     [2, "bbb", "aaa", '9.9.9.9', 5],
                     [21, "aaa", "ss", '6.4.0.3', 10],
@@ -44,7 +47,7 @@
                 ]
             });
             $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
-            $('#simpleTable').simpleTable('remove', $($('#simpleTable').find('[data-rowid]')[2]));
+            // $('#simpleTable').simpleTable('remove', $($('#simpleTable').find('[data-rowid]')[2]));
             $('#simpleTable').simpleTable('update',
                             $($('#simpleTable').find('[data-rowid]')[2]),
                             ["21sid", "aaasid", "sssid", '6.4.0.3sid', 10]);
