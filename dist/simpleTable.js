@@ -8,6 +8,10 @@
 (function ($) {
 
     var calculateObjectValue = function (o) {
+        var obj = {
+            val: '0',
+            isAnyString: false
+        };
         var arr = [];
         var strCount = 0;
         if (typeof o === 'number') {
@@ -16,20 +20,26 @@
 
         if (typeof o === 'string') {
             arr = o.split('').filter(function (item, index) {
-                return $.isNumeric(item);
+                if ($.isNumeric(item)) {
+                    return true;
+                } else {
+                    obj.isAnyString = true;
+                    return false;
+                }
             });
 
             if (!arr.length) {
                 for (var i = 0; i< o.length; i++) {
                     strCount += o.charCodeAt(i);
                 }
-                return strCount;
+                obj.val = strCount + '';
+                obj.isAnyString = false;
             } else {
-               return parseInt(arr.join(''));
+                obj.val = arr.join('');
             }
-        } else {
-            return 0;
         }
+
+        return obj;
     };
 
     var createData = function (oriData) {
@@ -265,20 +275,36 @@
         thead.on('click', '[data-sort]', function () {
             var col = $(this).attr('data-sort');
             var sortType = $(this).attr('data-sorttype');
+            var $this = $(this);
 
             // 默认搜索
             if (sortRows[col - 1] || (typeof sortRows[col - 1]) === 'undefined') {
-                if (sortType === 'desc') {
-                    that.bufferData.sort(function (a, b) {
-                        return calculateObjectValue(a[col]) - calculateObjectValue(b[col]);
-                    });
-                    $(this).attr('data-sorttype', 'asc');
-                } else {
-                    that.bufferData.sort(function(a, b) {
-                        return calculateObjectValue(b[col]) - calculateObjectValue(a[col]);
-                    });
-                    $(this).attr('data-sorttype', 'desc');
-                }
+                that.bufferData.sort(function (a, b) {
+                    var aa = calculateObjectValue(a[col]),
+                        bb = calculateObjectValue(b[col]);
+                        length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
+                        gap = 0;
+
+                    if (aa.isAnyString || bb.isAnyString) {
+                        for (var i = 0; i < length; i++) {
+                            if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
+                                gap = 1;
+                                break;
+                            }
+                            if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
+                                gap = -1;
+                                break;
+                            }
+                        }
+                    } else {
+                        gap = parseInt(aa.val) - parseInt(bb.val);
+                    }
+
+                    gap = (sortType === 'desc') ? gap : -gap
+                    $this.attr('data-sorttype', (sortType === 'desc') ? 'asc' : 'desc')
+
+                    return gap;
+                });
 
                 that.updatePagination();
                 that.updateTable();
@@ -329,10 +355,9 @@
 
     SimpleTable.prototype.reload = function (newData) {
         var data = createData(newData);
-        
+
         this.options.data = data;
         this.bufferData = data;
-        console.log(this.bufferData);
         this.updatePagination();
         this.updatePageNumber();
         this.updateTable();
