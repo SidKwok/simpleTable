@@ -1,6 +1,6 @@
 /**
  * @author Sid Kwok <oceankwok@hotmail.com
- * version: 2.0.0
+ * version: 2.1.0
  * https://github.com/SidKwok/simpleTable
  *
  */
@@ -32,6 +32,16 @@
         }
     };
 
+    var createData = function (oriData) {
+        var data = [];
+        $.each(oriData, function (i, e) {
+            // 每一列的第一个元素是tag, maybe哈希会更好
+            e.unshift(i);
+            data.push(e);
+        })
+        return data;
+    };
+
     // SIMPLETABLE CLASS DEFINITION
     // ======================
 
@@ -51,6 +61,10 @@
         sort: true,
         search: true,
         data:[],
+        pageOptions: {
+            pageItems: 10
+        },
+        sortRows: []
     };
 
     SimpleTable.prototype.init = function () {
@@ -58,13 +72,7 @@
     }
 
     SimpleTable.prototype.initTable = function () {
-        var data = [];
-        var oriData = this.options.data;
-        $.each(oriData, function (i, e) {
-            // 每一列的第一个元素是tag, maybe哈希会更好
-            e.unshift(i);
-            data.push(e);
-        })
+        var data = createData (this.options.data);
         this.options.data = data;
         this.bufferData = data;
 
@@ -158,9 +166,10 @@
         }
 
         var data = this.bufferData;
-        var length = Math.ceil(data.length / 10);
-        var first = (this.currentPage - 1) * 10;
-        var end = (this.currentPage === length) ? data.length : (first + 10);
+        var pageItems = this.options.pageOptions.pageItems;
+        var length = Math.ceil(data.length / pageItems);
+        var first = (this.currentPage - 1) * pageItems;
+        var end = (this.currentPage === length) ? data.length : (first + pageItems);
         var that = this;
 
         that.pageData = [];
@@ -178,7 +187,7 @@
             return;
         }
 
-        var length = Math.ceil(this.bufferData.length / 10);
+        var length = Math.ceil(this.bufferData.length / this.options.pageOptions.pageItems);
         var pagination = this.$el.parent().find('.pagination .pageNumber');
         var domArr = [];
         var cp = this.currentPage;
@@ -216,7 +225,7 @@
         // 下一页
         pagination.find('[data-stback]').on('click', function () {
             var nextPage = parseInt($(this).attr('data-stback'));
-            var allPages = Math.ceil(that.bufferData.length / 10);
+            var allPages = Math.ceil(that.bufferData.length / that.options.pageOptions.pageItems);
 
             if (nextPage <= allPages) {
                 pagination.find('[data-stpage="' + that.currentPage + '"]').removeClass('active');
@@ -245,6 +254,7 @@
         var thead = this.$el.find('thead');
         var ths = thead.find('th');
         var data = this.options.data;
+        var sortRows = this.options.sortRows;
         var that = this;
 
         ths.each(function (i, e) {
@@ -255,20 +265,24 @@
         thead.on('click', '[data-sort]', function () {
             var col = $(this).attr('data-sort');
             var sortType = $(this).attr('data-sorttype');
-            if (sortType === 'desc') {
-                that.bufferData.sort(function (a, b) {
-                    return calculateObjectValue(a[col]) - calculateObjectValue(b[col]);
-                });
-                $(this).attr('data-sorttype', 'asc');
-            } else {
-                that.bufferData.sort(function(a, b) {
-                    return calculateObjectValue(b[col]) - calculateObjectValue(a[col]);
-                });
-                $(this).attr('data-sorttype', 'desc');
-            }
 
-            that.updatePagination();
-            that.updateTable();
+            // 默认搜索
+            if (sortRows[col - 1] || (typeof sortRows[col - 1]) === 'undefined') {
+                if (sortType === 'desc') {
+                    that.bufferData.sort(function (a, b) {
+                        return calculateObjectValue(a[col]) - calculateObjectValue(b[col]);
+                    });
+                    $(this).attr('data-sorttype', 'asc');
+                } else {
+                    that.bufferData.sort(function(a, b) {
+                        return calculateObjectValue(b[col]) - calculateObjectValue(a[col]);
+                    });
+                    $(this).attr('data-sorttype', 'desc');
+                }
+
+                that.updatePagination();
+                that.updateTable();
+            }
         });
     }
 
@@ -313,7 +327,18 @@
         this.updateTable();
     }
 
-    var allowedMethods = ['append', 'remove', 'update'];
+    SimpleTable.prototype.reload = function (newData) {
+        var data = createData(newData);
+        
+        this.options.data = data;
+        this.bufferData = data;
+        console.log(this.bufferData);
+        this.updatePagination();
+        this.updatePageNumber();
+        this.updateTable();
+    }
+
+    var allowedMethods = ['append', 'remove', 'update', 'reload'];
 
     $.fn.simpleTable = function(opt) {
         var options = $.extend({}, SimpleTable.DEFAULTS, options),
@@ -332,14 +357,20 @@
                     return;
                 }
 
-                if (opt === 'append') {
-                    data.append(args[0]);
-                }
-                if (opt === 'remove') {
-                    data.remove(args[0]);
-                }
-                if (opt === 'update') {
-                    data.update(args);
+                switch (opt) {
+                    case 'append':
+                        data.append(args[0]);
+                        break;
+                    case 'remove':
+                        data.remove(args[0]);
+                        break;
+                    case 'update':
+                        data.update(args);
+                        break;
+                    case 'reload':
+                        data.reload(args[0]);
+                    default:
+                        break;
                 }
             }
             if (!data) {

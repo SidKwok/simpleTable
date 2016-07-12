@@ -2,7 +2,7 @@
 超简单，超小的jQuery表格插件
 
 ## Why I did this?
-
+---
 之前一直用dataTable进行表格的处理，dataTable是一个很好的表格解决方案。但是感觉我在日常开发中，dataTable中有很多功能我都是没有使用到的，以致于引入了许多不必要的代码。所以我根据自己的业务需求整了一个，功能非常的简单，甚至有点太简单了，连样式都没有(如果嫌麻烦可以直接用我提供的样式)，但是这提供了一个很好的自定义方案。
 
 ## Features
@@ -12,7 +12,8 @@
 * 分页
 * 添加
 * 删除
-* 修改
+* 更新
+* 重新载入数据
 
 ## Usage
 
@@ -56,33 +57,55 @@ done!
 
 ## API
 
-默认值:
+### 默认值
 
 ```js
 $('#simpleTable').simpleTable({
-    data: [],
-    sort: true,
-    search: true,
-    pagination: true
+    data: [],         // 传入的数据
+    sort: true,       // 是否排序
+    sortRow: [],      // 需要排序的列，只有开启了sort才会有用，默认所有列都排序
+    search: true,     // 是否有搜索框
+    pagination: true, // 是否分页
+    pageOptions: {
+        pageItems: 10 // 每一页的项数，只有开启了pagination才有效
+    },
 });
 ```
 
-添加数据。请保证数据的项数与表头一致:
+### 添加数据
+请保证数据的项数与表头一致:
 
 ```js
 $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
 ```
 
-删除数据。请将相应行的dom元素传进去:
+### 删除数据
+请将相应行的dom元素传进去:
 
 ```js
 $('#simpleTable').simpleTable('remove',$($('#simpleTable').find('[data-rowid]')[2]));
 ```
 
-更新数据。请将相应行的dom元素和更新的数据传进去:
+### 更新数据
+请将相应行的dom元素和更新的数据传进去:
 
 ```js
 $('#simpleTable').simpleTable('update',
                 $($('#simpleTable').find('[data-rowid]')[2]),
                 ["21sid", "aaasid", "sssid", '6.4.0.3sid', 10]);
+```
+
+### 重新载入数据
+这对于通过ajax来更新数据十分有效，该方法会先清空原有的数据然后注入新的数据：
+
+```js
+$('#simpleTable').simpleTable('reload',
+        [
+            [1,2,3,4,5],
+            [6,7,8,9,10],
+            [11,12,13,14,15],
+            [16,17,18,19,20],
+            [21,22,23,24,25]
+        ]
+);
 ```

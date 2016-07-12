@@ -18,7 +18,11 @@
         <script type="text/javascript">
             $('#simpleTable').simpleTable({
                 pagination: true,
+                pageOptions: {
+                    pageItems: 20
+                },
                 sort: true,
+                sortRows: [true, true, true, false, false],
                 search: true,
                 data: [
                     [2, "bbb", "aaa", '9.9.9.9', 5],
@@ -46,6 +50,14 @@
                     [17, 7, 'jjj', '5.2.0.0', 10],
                 ]
             });
+            $('#simpleTable').simpleTable('reload',
+                    [
+                        [1,2,3,4,5],
+                        [6,7,8,9,10],
+                        [11,12,13,14,15],
+                        [16,17,18,19,20],
+                        [21,22,23,24,25]
+                    ]);
             // $('#simpleTable').simpleTable('append', [24, 'ope', 18, '1.1.1', 22]);
             // $('#simpleTable').simpleTable('remove', $($('#simpleTable').find('[data-rowid]')[2]));
             // $('#simpleTable').simpleTable('update',
