@@ -63,7 +63,7 @@
         this.pageData = [];
         this.currentPage = 1;
 
-        this.init();
+        this.initTable();
     };
 
     SimpleTable.DEFAULTS = {
@@ -76,10 +76,6 @@
         },
         sortRows: []
     };
-
-    SimpleTable.prototype.init = function () {
-        this.initTable();
-    }
 
     SimpleTable.prototype.initTable = function () {
         var data = createData (this.options.data);

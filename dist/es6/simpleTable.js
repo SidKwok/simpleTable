@@ -74,15 +74,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.pageData = [];
             this.currentPage = 1;
 
-            this.init();
+            this.initTable();
         }
 
         _createClass(SimpleTable, [{
-            key: 'init',
-            value: function init() {
-                this.initTable();
-            }
-        }, {
             key: 'initTable',
             value: function initTable() {
                 var data = createData(this.options.data);

@@ -1,5 +1,5 @@
 /**
- * @author Sid Kwok <oceankwok@hotmail.com
+ * @author Sid Kwok <oceankwok@hotmail.com>
  * version: 2.1.0
  * https://github.com/SidKwok/simpleTable
  *
@@ -63,7 +63,7 @@
         this.pageData = [];
         this.currentPage = 1;
 
-        this.init();
+        this.initTable();
     };
 
     SimpleTable.DEFAULTS = {
@@ -77,10 +77,6 @@
         sortRows: []
     };
 
-    SimpleTable.prototype.init = function () {
-        this.initTable();
-    }
-
     SimpleTable.prototype.initTable = function () {
         var data = createData (this.options.data);
         this.options.data = data;
@@ -90,8 +86,6 @@
         this.$el.wrap('<div class="simpleTable" />');
         // 加tbody
         this.$el.append('<tbody></tbody>')
-
-        this.updateTable('init');
 
         // 分页
         if (this.options.pagination) {
@@ -180,13 +174,12 @@
         var length = Math.ceil(data.length / pageItems);
         var first = (this.currentPage - 1) * pageItems;
         var end = (this.currentPage === length) ? data.length : (first + pageItems);
-        var that = this;
 
-        that.pageData = [];
+        this.pageData = [];
 
         if (data.length) {
             for (var i = first; i < end; i++) {
-                that.pageData.push(data[i]);
+                this.pageData.push(data[i]);
             }
         }
     }
@@ -281,7 +274,7 @@
             if (sortRows[col - 1] || (typeof sortRows[col - 1]) === 'undefined') {
                 that.bufferData.sort(function (a, b) {
                     var aa = calculateObjectValue(a[col]),
-                        bb = calculateObjectValue(b[col]);
+                        bb = calculateObjectValue(b[col]),
                         length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
                         gap = 0;
 
@@ -366,8 +359,7 @@
     var allowedMethods = ['append', 'remove', 'update', 'reload'];
 
     $.fn.simpleTable = function(opt) {
-        var options = $.extend({}, SimpleTable.DEFAULTS, options),
-            args = Array.prototype.slice.call(arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
         this.each(function () {
             var $this = $(this),
                 data = $this.data('simpleTable'),

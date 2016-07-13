@@ -7,7 +7,7 @@
 
 (($) => {
 
-    var calculateObjectValue = function (o) {
+    let calculateObjectValue = function (o) {
         let obj = {
             val: '0',
             isAnyString: false
@@ -65,10 +65,6 @@
             this.pageData = [];
             this.currentPage = 1;
 
-            this.init();
-        }
-
-        init() {
             this.initTable();
         }
 
