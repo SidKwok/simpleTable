@@ -1,5 +1,5 @@
 /**
- * @author Sid Kwok <oceankwok@hotmail.com
+ * @author Sid Kwok <oceankwok@hotmail.com>
  * version: 2.1.0
  * https://github.com/SidKwok/simpleTable
  *
@@ -366,8 +366,7 @@
     var allowedMethods = ['append', 'remove', 'update', 'reload'];
 
     $.fn.simpleTable = function(opt) {
-        var options = $.extend({}, SimpleTable.DEFAULTS, options),
-            args = Array.prototype.slice.call(arguments, 1);
+        var args = Array.prototype.slice.call(arguments, 1);
         this.each(function () {
             var $this = $(this),
                 data = $this.data('simpleTable'),

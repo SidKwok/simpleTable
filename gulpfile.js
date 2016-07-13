@@ -1,11 +1,36 @@
 var gulp = require('gulp'),
-    uglify = require('gulp-uglify')
-    rename = require('gulp-rename');
+    $ = require('gulp-load-plugins')(),
+    browserSync = require('browser-sync').create();
 
-gulp.task('build', function(){
+// for ES5
+gulp.task('buildEs5', function(){
     return gulp.src('./src/simpleTable.js')
         .pipe(gulp.dest('./dist'))
-        .pipe(uglify())
-        .pipe(rename({ extname: '.min.js'}))
+        .pipe($.uglify())
+        .pipe($.rename({ extname: '.min.js'}))
         .pipe(gulp.dest('./dist'));
+});
+
+// for ES6
+gulp.task('buildEs6', function () {
+    return gulp.src('./src/es6/simpleTable.js')
+        .pipe($.plumber())
+        .pipe($.babel({
+            presets: ['es2015']
+        }))
+        .pipe(gulp.dest('./dist/es6'))
+        .pipe($.uglify())
+        .pipe($.rename({ extname: '.min.js'}))
+        .pipe(gulp.dest('./dist/es6'));
+});
+
+gulp.task('serve', function() {
+    browserSync.init({
+        server: {
+            baseDir: './'
+        }
+    });
+
+    gulp.watch('./src/es6/*.js', ['buildEs6']);
+    gulp.watch(['./index.html', './src/es6/*.js']).on('change', browserSync.reload);
 });
