@@ -91,8 +91,6 @@
         // 加tbody
         this.$el.append('<tbody></tbody>')
 
-        this.updateTable('init');
-
         // 分页
         if (this.options.pagination) {
             this.initPagination();
@@ -180,13 +178,12 @@
         var length = Math.ceil(data.length / pageItems);
         var first = (this.currentPage - 1) * pageItems;
         var end = (this.currentPage === length) ? data.length : (first + pageItems);
-        var that = this;
 
-        that.pageData = [];
+        this.pageData = [];
 
         if (data.length) {
             for (var i = first; i < end; i++) {
-                that.pageData.push(data[i]);
+                this.pageData.push(data[i]);
             }
         }
     }
@@ -281,7 +278,7 @@
             if (sortRows[col - 1] || (typeof sortRows[col - 1]) === 'undefined') {
                 that.bufferData.sort(function (a, b) {
                     var aa = calculateObjectValue(a[col]),
-                        bb = calculateObjectValue(b[col]);
+                        bb = calculateObjectValue(b[col]),
                         length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
                         gap = 0;
 
