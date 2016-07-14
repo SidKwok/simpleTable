@@ -68,13 +68,14 @@
 
     SimpleTable.DEFAULTS = {
         pagination: true,
-        sort: true,
-        search: true,
-        data:[],
         pageOptions: {
             pageItems: 10
         },
-        sortRows: []
+        sort: true,
+        sortRows: [],
+        sortIcons: ['fa fa-long-arrow-down', 'fa fa-long-arrow-up'],
+        search: true,
+        data:[],
     };
 
     SimpleTable.prototype.initTable = function () {
@@ -257,51 +258,57 @@
         var thead = this.$el.find('thead');
         var ths = thead.find('th');
         var data = this.options.data;
+        var icons = this.options.sortIcons;
+        var iconClass = icons[0].split(' ')[0],
+            iconDown = icons[0].split(' ')[1],
+            iconUp = icons[1].split(' ')[1];
         var sortRows = this.options.sortRows;
         var that = this;
 
-        ths.each(function (i, e) {
-            $(this).attr('data-sort', i + 1);
-            $(this).attr('data-sorttype', 'desc');
-        });
+        for (var i = 0; i < ths.length; i++) {
+            if (sortRows[i] || (typeof sortRows[i]) === 'undefined') {
+                $(ths[i]).attr('data-sort', i + 1);
+                $(ths[i]).attr('data-sorttype', 'desc');
+                $(ths[i]).append('&nbsp<i class="' + icons[0] + '"></i>');
+            }
+        }
 
         thead.on('click', '[data-sort]', function () {
             var col = $(this).attr('data-sort');
             var sortType = $(this).attr('data-sorttype');
             var $this = $(this);
 
-            // 默认搜索
-            if (sortRows[col - 1] || (typeof sortRows[col - 1]) === 'undefined') {
-                that.bufferData.sort(function (a, b) {
-                    var aa = calculateObjectValue(a[col]),
-                        bb = calculateObjectValue(b[col]),
-                        length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
-                        gap = 0;
+            $this.find('.fa').removeClass((sortType === 'desc') ? iconDown : iconUp);
+            $this.attr('data-sorttype', (sortType === 'desc') ? 'asc' : 'desc');
+            $this.find('.fa').addClass((sortType === 'desc') ? iconUp : iconDown);
 
-                    if (aa.isAnyString || bb.isAnyString) {
-                        for (var i = 0; i < length; i++) {
-                            if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
-                                gap = 1;
-                                break;
-                            }
-                            if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
-                                gap = -1;
-                                break;
-                            }
+            that.bufferData.sort(function (a, b) {
+                var aa = calculateObjectValue(a[col]),
+                    bb = calculateObjectValue(b[col]),
+                    length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
+                    gap = 0;
+
+                if (aa.isAnyString || bb.isAnyString) {
+                    for (var i = 0; i < length; i++) {
+                        if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
+                            gap = 1;
+                            break;
                         }
-                    } else {
-                        gap = parseInt(aa.val) - parseInt(bb.val);
+                        if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
+                            gap = -1;
+                            break;
+                        }
                     }
+                } else {
+                    gap = parseInt(aa.val) - parseInt(bb.val);
+                }
 
-                    gap = (sortType === 'desc') ? gap : -gap
-                    $this.attr('data-sorttype', (sortType === 'desc') ? 'asc' : 'desc')
+                gap = (sortType === 'desc') ? gap : -gap;
+                return gap;
+            });
 
-                    return gap;
-                });
-
-                that.updatePagination();
-                that.updateTable();
-            }
+            that.updatePagination();
+            that.updateTable();
         });
     }
 

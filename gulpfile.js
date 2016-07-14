@@ -5,6 +5,7 @@ var gulp = require('gulp'),
 // for ES5
 gulp.task('buildEs5', function(){
     return gulp.src('./src/simpleTable.js')
+        .pipe($.plumber())
         .pipe(gulp.dest('./dist'))
         .pipe($.uglify())
         .pipe($.rename({ extname: '.min.js'}))
@@ -32,5 +33,6 @@ gulp.task('serve', function() {
     });
 
     gulp.watch('./src/es6/*.js', ['buildEs6']);
-    gulp.watch(['./index.html', './src/es6/*.js']).on('change', browserSync.reload);
+    gulp.watch('./src/*.js', ['buildEs5']);
+    gulp.watch(['./index.html', './src/*.js', './src/es6/*.js']).on('change', browserSync.reload);
 });

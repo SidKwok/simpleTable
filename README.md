@@ -63,7 +63,9 @@ done!
 $('#simpleTable').simpleTable({
     data: [],         // 传入的数据
     sort: true,       // 是否排序
-    sortRow: [],      // 需要排序的列，只有开启了sort才会有用，默认所有列都排序
+    sortRow: [],      // 需要排序的列，只有开启了sort才会有用，默认所有列都排序。传进去的应该是一个布尔值的数组，数组大小应与表头一致
+    sortIcons: ['fa fa-long-arrow-down', 'fa fa-long-arrow-up'],
+                      // 所排序的列的icon，默认使用fonts-awesome
     search: true,     // 是否有搜索框
     pagination: true, // 是否分页
     pageOptions: {
@@ -109,3 +111,6 @@ $('#simpleTable').simpleTable('reload',
         ]
 );
 ```
+
+## 注意
+es6文件夹里面的东西是es6版本的simpleTable，没有经过测试，所以请以`dist/simpleTable.js`为准。
