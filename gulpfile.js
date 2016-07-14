@@ -5,16 +5,20 @@ var gulp = require('gulp'),
 // for ES5
 gulp.task('buildEs5', function(){
     return gulp.src('./src/simpleTable.js')
+        .pipe($.size())
         .pipe($.plumber())
         .pipe(gulp.dest('./dist'))
         .pipe($.uglify())
         .pipe($.rename({ extname: '.min.js'}))
-        .pipe(gulp.dest('./dist'));
+        .pipe(gulp.dest('./dist'))
+        .pipe($.size())
+        .pipe($.size({gzip: true}));
 });
 
 // for ES6
 gulp.task('buildEs6', function () {
     return gulp.src('./src/es6/simpleTable.js')
+        .pipe($.size())
         .pipe($.plumber())
         .pipe($.babel({
             presets: ['es2015']
@@ -22,7 +26,9 @@ gulp.task('buildEs6', function () {
         .pipe(gulp.dest('./dist/es6'))
         .pipe($.uglify())
         .pipe($.rename({ extname: '.min.js'}))
-        .pipe(gulp.dest('./dist/es6'));
+        .pipe(gulp.dest('./dist/es6'))
+        .pipe($.size())
+        .pipe($.size({gzip: true}));
 });
 
 gulp.task('serve', function() {
