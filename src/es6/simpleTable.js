@@ -44,8 +44,7 @@
 
     let createData = function (oriData) {
         let data = [];
-        $.each(oriData, function (i, e) {
-            // 每一列的第一个元素是tag, maybe哈希会更好
+        $.each(oriData, (i, e) => {
             e.unshift(i);
             data.push(e);
         })
