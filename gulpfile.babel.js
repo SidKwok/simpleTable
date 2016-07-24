@@ -1,9 +1,9 @@
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     $ = require('gulp-load-plugins')(),
     browserSync = require('browser-sync').create();
 
 // for ES5
-gulp.task('buildEs5', function(){
+gulp.task('buildEs5', () => {
     return gulp.src('./src/simpleTable.js')
         .pipe($.size())
         .pipe($.plumber())
@@ -16,7 +16,7 @@ gulp.task('buildEs5', function(){
 });
 
 // for ES6
-gulp.task('buildEs6', function () {
+gulp.task('buildEs6', () => {
     return gulp.src('./src/es6/simpleTable.js')
         .pipe($.size())
         .pipe($.plumber())
@@ -31,7 +31,7 @@ gulp.task('buildEs6', function () {
         .pipe($.size({gzip: true}));
 });
 
-gulp.task('serve', function() {
+gulp.task('serve', () => {
     browserSync.init({
         server: {
             baseDir: './'

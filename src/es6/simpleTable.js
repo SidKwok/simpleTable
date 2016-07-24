@@ -143,12 +143,13 @@
 
         initPagination() {
             $('<div class="pagination"></div>').insertAfter(this.$el);
-            this.$el.parent().find('.pagination').append(
-                '<span>' +
-                    '<a href="javascript: void(0);" class="stfront" data-stfront="0">&lt;</a>' +
-                        '<span class="pageNumber"></span>' +
-                    '<a href="javascript: void(0);" class="stback" data-stback="2">&gt;</a>' +
-                '</span>');
+            this.$el.parent().find('.pagination').append(`
+                <span>
+                    <a href="javascript: void(0);" class="stfront" data-stfront="0">&lt;</a>
+                        <span class="pageNumber"></span>
+                    <a href="javascript: void(0);" class="stback" data-stback="2">&gt;</a>
+                </span>
+                `);
             this.updatePagination();
             this.updatePageNumber();
             this.onPagination();
