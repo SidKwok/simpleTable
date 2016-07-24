@@ -199,7 +199,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'initPagination',
             value: function initPagination() {
                 $('<div class="pagination"></div>').insertAfter(this.$el);
-                this.$el.parent().find('.pagination').append('\n                <span>\n                    <a href="javascript: void(0);" class="stfront" data-stfront="0">&lt;</a>\n                        <span class="pageNumber"></span>\n                    <a href="javascript: void(0);" class="stback" data-stback="2">&gt;</a>\n                </span>\n                ');
+                this.$el.parent().find('.pagination').append('\n                <span>\n                    <a href="javascript: void(0);" class="stfront" data-stfront="0">&lt;</a><span class="pageNumber"></span><a href="javascript: void(0);" class="stback" data-stback="2">&gt;</a>\n                </span>\n                ');
                 this.updatePagination();
                 this.updatePageNumber();
                 this.onPagination();
@@ -241,7 +241,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 pagination.children().detach();
 
                 for (var i = 0; i < length; i++) {
-                    domArr.push('<a href="javascript: void(0);" ' + 'class="' + (cp === i + 1 ? 'active' : '') + '" ' + 'data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
+                    // domArr.push('<a href="javascript: void(0);" ' +
+                    //                 'class="' + (cp === (i + 1) ? 'active' : '') +'" ' +
+                    //                 'data-stpage="' + (i + 1) + '">' +
+                    //                 (i + 1) +
+                    //             '</a>');
+                    domArr.push('<a href="javascript: void(0);" class="' + (cp === i + 1 ? 'active' : '') + '" data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
                 }
 
                 pagination.append(domArr.join(''));
