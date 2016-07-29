@@ -42,3 +42,5 @@ gulp.task('serve', () => {
     gulp.watch('./src/*.js', ['buildEs5']);
     gulp.watch(['./index.html', './src/*.js', './src/es6/*.js']).on('change', browserSync.reload);
 });
+
+gulp.task('build', ['buildEs5', 'buildEs6']);

@@ -1,12 +1,17 @@
 /**
  * @author Sid Kwok <oceankwok@hotmail.com>
- * version: 2.1.0
+ * version: 2.1.1
  * https://github.com/SidKwok/simpleTable
  *
  */
 
 (function ($) {
 
+    /**
+     * 计算统一之后的值大小
+     * @param  {String, Number} o 传入的值
+     * @return {Object}   包含标记与值大小
+     */
     var calculateObjectValue = function (o) {
         var obj = {
             val: '0',
@@ -42,6 +47,11 @@
         return obj;
     };
 
+    /**
+     * 生成数据
+     * @param  {Array} oriData 原始数据
+     * @return {Array} 添加了tag之后的数据
+     */
     var createData = function (oriData) {
         var data = [];
         $.each(oriData, function (i, e) {
@@ -51,6 +61,39 @@
         })
         return data;
     };
+
+    /**
+     * 排序算法
+     * @param  {String, Number} a   数据项
+     * @param  {String, Number} b   数据项
+     * @param  {Number} col 第几列
+     * @param  {String} sortType 排序类型
+     * @return {Number} 比较结果
+     */
+    var sortAlgorithm = function (a, b, col, sortType) {
+        var aa = calculateObjectValue(a[col]),
+            bb = calculateObjectValue(b[col]),
+            length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
+            gap = 0;
+
+        if (aa.isAnyString || bb.isAnyString) {
+            for (var i = 0; i < length; i++) {
+                if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
+                    gap = 1;
+                    break;
+                }
+                if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
+                    gap = -1;
+                    break;
+                }
+            }
+        } else {
+            gap = parseInt(aa.val) - parseInt(bb.val);
+        }
+
+        gap = (sortType === 'desc') ? gap : -gap;
+        return gap;
+    }
 
     // SIMPLETABLE CLASS DEFINITION
     // ======================
@@ -72,7 +115,8 @@
             pageItems: 10
         },
         sort: true,
-        sortRows: [],
+        sortCols: [],
+        sortDefaultCol: 0,
         sortIcons: ['fa fa-long-arrow-down', 'fa fa-long-arrow-up'],
         search: true,
         data:[],
@@ -262,15 +306,23 @@
         var iconClass = icons[0].split(' ')[0],
             iconDown = icons[0].split(' ')[1],
             iconUp = icons[1].split(' ')[1];
-        var sortRows = this.options.sortRows;
+        var sortCols = this.options.sortCols;
+        var sortDefaultCol = this.options.sortDefaultCol;
         var that = this;
 
         for (var i = 0; i < ths.length; i++) {
-            if (sortRows[i] || (typeof sortRows[i]) === 'undefined') {
+            if (sortCols[i] || (typeof sortCols[i]) === 'undefined') {
                 $(ths[i]).attr('data-sort', i + 1);
                 $(ths[i]).attr('data-sorttype', 'desc');
                 $(ths[i]).append('&nbsp<i class="' + icons[0] + '"></i>');
             }
+        }
+        if (sortDefaultCol) {
+            this.bufferData.sort(function (a, b) {
+                return sortAlgorithm(a, b, sortDefaultCol, 'asc');
+            });
+            this.updatePagination();
+            this.updateTable();
         }
 
         thead.on('click', '[data-sort]', function () {
@@ -283,28 +335,7 @@
             $this.find('.fa').addClass((sortType === 'desc') ? iconUp : iconDown);
 
             that.bufferData.sort(function (a, b) {
-                var aa = calculateObjectValue(a[col]),
-                    bb = calculateObjectValue(b[col]),
-                    length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
-                    gap = 0;
-
-                if (aa.isAnyString || bb.isAnyString) {
-                    for (var i = 0; i < length; i++) {
-                        if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
-                            gap = 1;
-                            break;
-                        }
-                        if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
-                            gap = -1;
-                            break;
-                        }
-                    }
-                } else {
-                    gap = parseInt(aa.val) - parseInt(bb.val);
-                }
-
-                gap = (sortType === 'desc') ? gap : -gap;
-                return gap;
+                return sortAlgorithm(a, b, col, sortType);
             });
 
             that.updatePagination();

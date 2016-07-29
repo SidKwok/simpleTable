@@ -14,7 +14,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 
 (function ($) {
-
+    /**
+     * 计算统一之后的值大小
+     * @param  {String, Number} o 传入的值
+     * @return {Object}   包含标记与值大小
+     */
     var calculateObjectValue = function calculateObjectValue(o) {
         var obj = {
             val: '0',
@@ -50,6 +54,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return obj;
     };
 
+    /**
+     * 生成数据
+     * @param  {Array} oriData 原始数据
+     * @return {Array} 添加了tag之后的数据
+     */
     var createData = function createData(oriData) {
         var data = [];
         $.each(oriData, function (i, e) {
@@ -57,6 +66,39 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             data.push(e);
         });
         return data;
+    };
+
+    /**
+     * 排序算法
+     * @param  {String, Number} a   数据项
+     * @param  {String, Number} b   数据项
+     * @param  {Number} col 第几列
+     * @param  {String} sortType 排序类型
+     * @return {Number} 比较结果
+     */
+    var sortAlgorithm = function sortAlgorithm(a, b, col, sortType) {
+        var aa = calculateObjectValue(a[col]),
+            bb = calculateObjectValue(b[col]),
+            length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
+            gap = 0;
+
+        if (aa.isAnyString || bb.isAnyString) {
+            for (var i = 0; i < length; i++) {
+                if (parseInt(aa.val[i]) > parseInt(bb.val[i])) {
+                    gap = 1;
+                    break;
+                }
+                if (parseInt(aa.val[i]) < parseInt(bb.val[i])) {
+                    gap = -1;
+                    break;
+                }
+            }
+        } else {
+            gap = parseInt(aa.val) - parseInt(bb.val);
+        }
+
+        gap = sortType === 'desc' ? gap : -gap;
+        return gap;
     };
 
     // SIMPLETABLE CLASS DEFINITION
@@ -241,11 +283,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 pagination.children().detach();
 
                 for (var i = 0; i < length; i++) {
-                    // domArr.push('<a href="javascript: void(0);" ' +
-                    //                 'class="' + (cp === (i + 1) ? 'active' : '') +'" ' +
-                    //                 'data-stpage="' + (i + 1) + '">' +
-                    //                 (i + 1) +
-                    //             '</a>');
                     domArr.push('<a href="javascript: void(0);" class="' + (cp === i + 1 ? 'active' : '') + '" data-stpage="' + (i + 1) + '">' + (i + 1) + '</a>');
                 }
 
@@ -302,20 +339,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function initSort() {
                 var thead = this.$el.find('thead');
                 var ths = thead.find('th');
-                var data = this.options.data;
-                var icons = this.options.sortIcons;
-                var iconClass = icons[0].split(' ')[0],
-                    iconDown = icons[0].split(' ')[1],
-                    iconUp = icons[1].split(' ')[1];
-                var sortRows = this.options.sortRows;
-                var that = this;
+                var _options = this.options;
+                var data = _options.data;
+                var sortIcons = _options.sortIcons;
+                var sortCols = _options.sortCols;
+                var sortDefaultCol = _options.sortDefaultCol;
 
+                var iconClass = sortIcons[0].split(' ')[0],
+                    iconDown = sortIcons[0].split(' ')[1],
+                    iconUp = sortIcons[1].split(' ')[1];
+                var that = this;
                 for (var i = 0; i < ths.length; i++) {
-                    if (sortRows[i] || typeof sortRows[i] === 'undefined') {
+                    if (sortCols[i] || typeof sortCols[i] === 'undefined') {
                         $(ths[i]).attr('data-sort', i + 1);
                         $(ths[i]).attr('data-sorttype', 'desc');
-                        $(ths[i]).append('&nbsp<i class="' + icons[0] + '"></i>');
+                        $(ths[i]).append('&nbsp<i class="' + sortIcons[0] + '"></i>');
                     }
+                }
+
+                if (sortDefaultCol) {
+                    this.bufferData.sort(function (a, b) {
+                        return sortAlgorithm(a, b, sortDefaultCol, 'asc');
+                    });
+                    this.updatePagination();
+                    this.updateTable();
                 }
 
                 thead.on('click', '[data-sort]', function () {
@@ -328,28 +375,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     $this.find('.fa').addClass(sortType === 'desc' ? iconUp : iconDown);
 
                     that.bufferData.sort(function (a, b) {
-                        var aa = calculateObjectValue(a[col]),
-                            bb = calculateObjectValue(b[col]),
-                            length = aa.val.length > bb.val.length ? aa.val.length : bb.val.length,
-                            gap = 0;
-
-                        if (aa.isAnyString || bb.isAnyString) {
-                            for (var _i = 0; _i < length; _i++) {
-                                if (parseInt(aa.val[_i]) > parseInt(bb.val[_i])) {
-                                    gap = 1;
-                                    break;
-                                }
-                                if (parseInt(aa.val[_i]) < parseInt(bb.val[_i])) {
-                                    gap = -1;
-                                    break;
-                                }
-                            }
-                        } else {
-                            gap = parseInt(aa.val) - parseInt(bb.val);
-                        }
-
-                        gap = sortType === 'desc' ? gap : -gap;
-                        return gap;
+                        return sortAlgorithm(a, b, col, sortType);
                     });
 
                     that.updatePagination();
@@ -426,7 +452,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         pageOptions: {
             pageItems: 10
         },
-        sortRows: []
+        sortCols: [],
+        sortIcons: ['fa fa-long-arrow-down', 'fa fa-long-arrow-up'],
+        sortDefaultCol: 0
     };
 
     var allowedMethods = ['append', 'remove', 'update', 'reload'];

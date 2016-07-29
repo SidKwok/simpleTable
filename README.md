@@ -61,15 +61,16 @@ done!
 
 ```js
 $('#simpleTable').simpleTable({
-    data: [],         // 传入的数据
-    sort: true,       // 是否排序
-    sortRow: [],      // 需要排序的列，只有开启了sort才会有用，默认所有列都排序。传进去的应该是一个布尔值的数组，数组大小应与表头一致
+    data: [],          // 传入的数据
+    sort: true,        // 是否排序
+    sortCols: [],      // 需要排序的列，只有开启了sort才会有用，默认所有列都排序。传进去的应该是一个布尔值的数组，数组大小应与表头一致
+    sortDefaultCol: 0, // 生成表格时按照哪里进行排序，默认不排序
     sortIcons: ['fa fa-long-arrow-down', 'fa fa-long-arrow-up'],
-                      // 所排序的列的icon，默认使用fonts-awesome
-    search: true,     // 是否有搜索框
-    pagination: true, // 是否分页
+                       // 所排序的列的icon，默认使用fonts-awesome
+    search: true,      // 是否有搜索框
+    pagination: true,  // 是否分页
     pageOptions: {
-        pageItems: 10 // 每一页的项数，只有开启了pagination才有效
+        pageItems: 10  // 每一页的项数，只有开启了pagination才有效
     },
 });
 ```
